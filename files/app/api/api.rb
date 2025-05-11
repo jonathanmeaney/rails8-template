@@ -5,7 +5,14 @@ class API < Grape::API
   helpers Authentication
   helpers APIHelpers
 
+  use GrapeLogging::Middleware::RequestLogger,
+      logger: logger,
+      formatter: GrapeLogging::Formatters::Rails.new,
+      include: [GrapeLogging::Loggers::FilterParameters.new,
+                GrapeLogging::Loggers::ClientEnv.new]
+
   rescue_from :all do |e|
+    API.logger.error e
     error!({ error: e.message }, 500)
   end
 
