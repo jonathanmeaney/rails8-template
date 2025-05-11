@@ -1,5 +1,3 @@
-# rails new someAppName --api --devcontainer -m /Users/jonathanmeaney/Development/rails/templates/grape_api_template.rb
-
 require 'fileutils'
 require 'securerandom'
 
