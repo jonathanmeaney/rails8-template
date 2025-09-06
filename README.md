@@ -40,7 +40,7 @@ If using `devcontainer` then the following customization is useful for Ruby and 
         }
       },
       "ruby.format": "rubocop",
-      "ruby.rubocop.executePath": "/home/vscode/.rbenv/shims/",
+      "ruby.rubocop.executePath": "/home/vscode/.local/share/mise/installs/ruby/3.4.1/bin/",
       "files.associations": {
         "Gemfile": "ruby"
       },

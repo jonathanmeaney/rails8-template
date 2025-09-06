@@ -6,7 +6,7 @@ module Authentication
     JWT.encode(
       {
         data: { id: payload.id, email: payload.email },
-        exp: now + 3.minutes.to_i,
+        exp: now + 3.hours.to_i,
         iat: now,
         iss: 'grape_jwt_api',
         aud: 'grape_jwt_client',
