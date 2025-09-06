@@ -108,6 +108,7 @@ after_bundle do
     user.create_profile!(
       first_name: 'Jonathan',
       last_name: 'Meaney',
+      telephone: '0123456789',
       dob: '1990-01-01'
     )
   RUBY
