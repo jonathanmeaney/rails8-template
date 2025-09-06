@@ -1,0 +1,12 @@
+module Entities
+  class <%= class_name %> < Grape::Entity
+    expose :id
+    <% attributes.each do |attr| -%>
+      <% if attr.type.to_s == 'datetime' %>
+      expose :<%= attr.name %>, documentation: { type: 'DateTime' }, format_with: :date_time_format
+      <% else %>
+      expose :<%= attr.name %><% if attr.type %>, documentation: { type: '<%= attr.type.to_s.capitalize %>' }<% end %>
+      <% end -%>
+    <% end -%>
+  end
+end

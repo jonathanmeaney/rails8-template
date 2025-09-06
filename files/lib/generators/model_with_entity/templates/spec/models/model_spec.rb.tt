@@ -1,0 +1,13 @@
+require 'rails_helper'
+
+RSpec.describe <%= class_name %>, type: :model do
+  subject(:model) { build(:<%= file_name %>) } # uses FactoryBot
+
+  # ===== Factories =====
+  it 'has a valid factory' do
+    expect(build(:<%= file_name %>)).to be_valid
+  end
+
+  # ===== Optimistic locking (if you use lock_version) =====
+  it_behaves_like 'optimistically lockable', :<%= file_name %>
+end

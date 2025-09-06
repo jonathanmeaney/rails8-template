@@ -1,0 +1,12 @@
+require 'rails_helper'
+
+RSpec.describe Entities::<%= entity_class_name %>, type: :entity do
+  let(:record) { stub_model(<%= entity_class_name %>) }
+  subject { described_class.represent(record).as_json }
+
+<% attributes.each do |attr| -%>
+  it 'exposes :<%= attr.name %>' do
+    expect(subject[:<%= attr.name %>]).to eq(record.<%= attr.name %>)
+  end
+<% end -%>
+end

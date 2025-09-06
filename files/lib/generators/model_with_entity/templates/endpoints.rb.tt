@@ -1,0 +1,113 @@
+module Endpoints
+  class <%= plural_class_name %>
+    # Centralized error handling
+    rescue_from ActiveRecord::RecordNotFound do |e|
+      error!({ error: e.message }, 404)
+    end
+
+    rescue_from ActiveRecord::StaleObjectError do |e|
+      error!({ error: 'Conflict: resource was modified by someone else' }, 409)
+    end
+
+    helpers do
+      # Shared params for ID and optimistic-locking
+      params :id_and_lock do
+        requires :id,          type: Integer, desc: '<%= class_name %> ID'
+        requires :lock_version, type: Integer, desc: '<%= class_name %> version for optimistic locking'
+      end
+
+      def load_<%= file_name %>
+        @<%= file_name %> = <%= class_name %>.find(params[:id])
+      end
+
+      def apply_lock_version!
+        @<%= file_name %>.lock_version = params[:lock_version] if params[:lock_version]
+      end
+    end
+
+    resource :<%= plural_file_name %> do
+      desc 'Get all <%= plural_file_name %>',
+          success: Entities::<%= entity_class_name %>,
+          failure: [{ code: 401, message: 'Unauthorized' }]
+      get do
+        collection = <%= class_name %>.all
+        present collection, with: Entities::<%= entity_class_name %>
+      end
+
+      desc 'Get a single <%= file_name %>',
+          success: Entities::<%= entity_class_name %>,
+          failure: [
+            { code: 401, message: 'Unauthorized' },
+            { code: 404, message: 'Not Found' }
+          ]
+      params do
+        requires :id, type: Integer, desc: '<%= class_name %> ID'
+      end
+      get ':id' do
+        load_<%= file_name %>
+        present @<%= file_name %>, with: Entities::<%= entity_class_name %>
+      end
+
+      desc 'Create a new <%= file_name %>',
+          success: Entities::<%= entity_class_name %>,
+          failure: [
+            { code: 401, message: 'Unauthorized' },
+            { code: 422, message: 'Unprocessable Entity' }
+          ]
+      params do
+<% attributes.each do |attr| -%>
+        requires :<%= attr.name %>, type: <%= attr.type.to_s.capitalize %>, desc: '<%= attr.name.humanize %>'
+<% end -%>
+      end
+      post do
+        record = <%= class_name %>.new(declared(params, include_missing: false))
+        if record.save
+          status 201
+          present record, with: Entities::<%= entity_class_name %>
+        else
+          error!({ errors: record.errors.full_messages }, 422)
+        end
+      end
+
+      desc 'Update an existing <%= file_name %>',
+          success: Entities::<%= entity_class_name %>,
+          failure: [
+            { code: 401, message: 'Unauthorized' },
+            { code: 404, message: 'Not Found' },
+            { code: 409, message: 'Conflict' },
+            { code: 422, message: 'Unprocessable Entity' }
+          ]
+      params do
+        use :id_and_lock
+<% attributes.each do |attr| -%>
+        optional :<%= attr.name %>, type: <%= attr.type.to_s.capitalize %>, desc: '<%= attr.name.humanize %>'
+<% end -%>
+      end
+      put ':id' do
+        load_<%= file_name %>
+        apply_lock_version!
+        if @<%= file_name %>.update(declared(params, include_missing: false))
+          present @<%= file_name %>, with: Entities::<%= entity_class_name %>
+        else
+          error!({ errors: @<%= file_name %>.errors.full_messages }, 422)
+        end
+      end
+
+      desc 'Delete a <%= file_name %>',
+          failure: [
+            { code: 401, message: 'Unauthorized' },
+            { code: 404, message: 'Not Found' },
+            { code: 409, message: 'Conflict' }
+          ]
+      params do
+        use :id_and_lock
+      end
+      delete ':id' do
+        load_<%= file_name %>
+        apply_lock_version!
+        @<%= file_name %>.destroy!
+        status 204
+      end
+    end
+  end
+end
