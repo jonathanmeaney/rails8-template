@@ -21,7 +21,7 @@ class ModelWithEntityGenerator < Rails::Generators::NamedBase
   def create_grape_entity
     template(
       'entity.rb.tt',
-      File.join('app', 'entities', "#{file_name}.rb")
+      File.join('app', 'api', 'entities', "#{file_name}.rb")
     )
   end
 
@@ -29,7 +29,7 @@ class ModelWithEntityGenerator < Rails::Generators::NamedBase
   def create_grape_endpoints
     template(
       'endpoints.rb.tt',
-      File.join('app', 'endpoints', "#{plural_file_name}.rb")
+      File.join('app', 'api', 'endpoints', "#{plural_file_name}.rb")
     )
   end
 
@@ -45,7 +45,7 @@ class ModelWithEntityGenerator < Rails::Generators::NamedBase
   def create_entity_spec
     template(
       'spec/entities/entity_spec.rb.tt',
-      File.join('spec',  'entities', "#{file_name}_spec.rb")
+      File.join('spec', 'entities', "#{file_name}_spec.rb")
     )
   end
 

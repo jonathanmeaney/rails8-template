@@ -34,7 +34,7 @@ after_bundle do
   # Run the default Rails app generation
   generate(:model, 'User', 'email:string:uniq', 'password_digest:string', 'lock_version:integer')
   generate(:model, 'Profile', 'user:references', 'first_name:string', 'last_name:string', 'telephone:string',
-           'dob:date', 'lock_version:integer')
+           'dob:string', 'lock_version:integer')
 
   # Modify the generated User model file
   user_model_file = 'app/models/user.rb'
@@ -56,6 +56,7 @@ after_bundle do
 
   encrypts :first_name, deterministic: true
   encrypts :last_name, deterministic: true
+  attribute :dob, :date
   encrypts :dob, deterministic: true
 
   validates :first_name, :last_name, :dob, presence: true
@@ -75,7 +76,7 @@ after_bundle do
   FileUtils.cp_r File.join(template_dir, 'app', 'api'), 'app/'
   FileUtils.cp_r File.join(template_dir, 'app', 'views', 'rswag'), 'app/views'
   FileUtils.cp_r File.join(template_dir, 'config', 'initializers'), 'config/'
-  FileUtils.cp_r File.join(template_dir, 'spec'), 'spec/'
+  FileUtils.cp_r File.join(template_dir, 'spec/'), 'spec/'
   FileUtils.cp_r File.join(template_dir, 'lib', 'generators'), 'lib/'
   # Copy RuboCop config to project root
   FileUtils.cp File.join(template_dir, '.rubocop.yml'), '.rubocop.yml'
